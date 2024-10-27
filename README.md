@@ -1,5 +1,7 @@
 # Mineconomy
 
+[English](./README.md) | [한국어](./README.ko.md)
+
 Mineconomy is an open-source Minecraft economy plugin collection built to bring advanced financial systems to Minecraft servers, including currency, stocks, banks, shops, and more.
 
 ## Features
