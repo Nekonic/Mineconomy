@@ -1,3 +1,5 @@
+[English](./CODE_OF_CONDUCT.md) | [한국어](./CODE_OF_CONDUCT.ko.md)
+
 # 기여자 행동 강령
 
 ## 우리의 약속
