@@ -1,0 +1,2 @@
+# Mineconomy
+Minecraft Economy Plugin
