@@ -27,6 +27,10 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
 
+      - name: Verify Build Output
+        run: ls -R build/libs  # 빌드된 파일이 위치한 경로 확인
+
+
       - name: Package Release Files
         run: |
           mkdir release
