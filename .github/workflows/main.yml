@@ -39,7 +39,7 @@ jobs:
       - name: Package Resource Pack
         run: |
           mkdir -p release
-          cp Resource_Pack/*.zip release/  # 리소스 팩 압축 파일을 release 폴더에 복사
+          zip -r release/Resource_Pack.zip Resource_Pack/
 
       - name: Upload Release
         uses: ncipollo/release-action@v1
