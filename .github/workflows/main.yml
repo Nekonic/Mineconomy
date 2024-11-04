@@ -46,10 +46,5 @@ jobs:
         with:
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          body: |
-            자동 생성된 릴리즈입니다.
-          draft: false
-          prerelease: false
-          artifacts: |
-            release/*.jar
-            release/*.zip
+          body: 자동 생성된 릴리즈입니다.
+          replaceArtifacts: true   # 기존 아티팩트 대체
