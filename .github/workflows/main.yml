@@ -50,5 +50,6 @@ jobs:
           artifacts: |
             release/*.jar
             release/*.zip
-          replacesArtifacts: true         # 기존 아티팩트를 대체
-          skipIfReleaseExists: false       # 릴리즈가 이미 있으면 업데이트
+          removeArtifacts: true        # 기존 아티팩트를 제거하고 새 아티팩트 추가
+          skipIfReleaseExists: false   # 릴리즈가 이미 있으면 업데이트
+      
