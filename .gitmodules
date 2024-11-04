@@ -4,3 +4,6 @@
 [submodule "Dynamic_Graph"]
 	path = Dynamic_Graph
 	url = https://github.com/Nekonic/Dynamic_Graph
+[submodule "Mineconomy-Resource-Pack"]
+	path = Mineconomy-Resource-Pack
+	url = https://github.com/Nekonic/Mineconomy-Resource-Pack
