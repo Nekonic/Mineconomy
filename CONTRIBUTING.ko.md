@@ -11,7 +11,7 @@ Mineconomy 프로젝트에 기여해 주셔서 감사합니다! 여러분의 기
 
 ## 코드 스타일
 
-- **[Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)**를 따라 이름 지정, 들여쓰기, 구조를 유지해 주세요.
+- [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)를 따라 이름 지정, 들여쓰기, 구조를 유지해 주세요.
 - 코드가 모듈화되어 있고 주석이 명확히 작성되었는지 확인해 주세요.
 - 일관된 공백을 사용하고, 사용되지 않는 import를 지양하며, 코드 제출 전에 올바르게 포맷해 주세요.
 
