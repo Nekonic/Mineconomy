@@ -1,10 +1,9 @@
 name: Build and Release Mineconomy
 
 on:
-  workflow_dispatch:
   push:
     tags:
-      - 'v*'
+      - 'v*'  # 태그가 v로 시작하는 경우에만 실행
 
 jobs:
   build-and-release:
@@ -14,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          submodules: recursive  # 서브모듈을 재귀적으로 체크아웃하여 최신 소스 가져오기
+          submodules: recursive  # 서브모듈 포함하여 체크아웃
 
       - name: Set up JDK 22
         uses: actions/setup-java@v3
@@ -22,27 +21,17 @@ jobs:
           distribution: 'temurin'
           java-version: '22'
 
-
-      - name: Generate build.gradle for Mineconomy-Core
-        run: |
-          echo "plugins { id 'java' }" > Mineconomy-Core/build.gradle
-
       - name: Build Mineconomy-Core
         run: |
           cd Mineconomy-Core
-          gradle wrapper  # Gradle Wrapper 동적 생성
-          ./gradlew build
+          ./gradlew build  # 빌드 명령어 실행
+          mkdir -p ../release
           cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
-
-      - name: Generate build.gradle for Dynamic_Graph
-        run: |
-          echo "plugins { id 'java' }" > Dynamic_Graph/build.gradle
 
       - name: Build Dynamic_Graph
         run: |
           cd Dynamic_Graph
-          gradle wrapper  # Gradle Wrapper 동적 생성
-          ./gradlew build
+          ./gradlew build  # 빌드 명령어 실행
           cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
 
       - name: Package Resource Pack
