@@ -34,6 +34,10 @@ jobs:
           ./gradlew build
           cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
 
+      - name: Generate build.gradle for Dynamic_Graph
+        run: |
+          echo "plugins { id 'java' }" > Dynamic_Graph/build.gradle
+
       - name: Build Dynamic_Graph
         run: |
           cd Dynamic_Graph
