@@ -1,9 +1,9 @@
-name: Release Automation
+name: Build and Release Mineconomy
 
 on:
   push:
     tags:
-      - 'v*.*.*'  # 태그를 통해 릴리즈를 트리거. 예: v1.0.0
+      - 'v*'  # v로 시작하는 태그가 푸시될 때 트리거됩니다.
 
 jobs:
   build-and-release:
@@ -30,12 +30,12 @@ jobs:
             gradle-${{ runner.os }}-
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: gradle build  # gradlew 대신 gradle로 직접 호출
 
       - name: Package Release Files
         run: |
           mkdir release
-          cp -r build/libs/* release/  # 빌드된 JAR 파일 복사
+          cp -r build/libs/* release/  # 코어 빌드된 JAR 파일 복사
           cp -r path/to/Dynamic_Graph/build/libs/* release/  # 그래프 모듈 복사
           cp -r path/to/Resource_Pack/*.zip release/  # 리소스팩 압축 파일 복사
 
@@ -45,7 +45,7 @@ jobs:
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            Release
+            자동 생성된 Release
           draft: false
           prerelease: false
           artifacts: |
