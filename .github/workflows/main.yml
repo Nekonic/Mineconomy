@@ -24,6 +24,7 @@ jobs:
       - name: Build Mineconomy-Core
         run: |
           cd Mineconomy-Core
+          chmod +x ./gradlew
           ./gradlew build  # 빌드 명령어 실행
           mkdir -p ../release
           cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
@@ -31,6 +32,7 @@ jobs:
       - name: Build Dynamic_Graph
         run: |
           cd Dynamic_Graph
+          chmod +x ./gradlew
           ./gradlew build  # 빌드 명령어 실행
           cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
 
