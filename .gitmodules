@@ -1,0 +1,6 @@
+[submodule "Mineconomy-Core"]
+	path = Mineconomy-Core
+	url = https://github.com/Nekonic/Mineconomy-Core
+[submodule "Dynamic_Graph"]
+	path = Dynamic_Graph
+	url = https://github.com/Nekonic/Dynamic_Graph
