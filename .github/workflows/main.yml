@@ -36,10 +36,10 @@ jobs:
           ./gradlew build  # 빌드 명령어 실행
           cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
 
-      - name: Package Resource Pack
+      - name: Package Mineconomy-Resource-Pack
         run: |
           mkdir -p release
-          zip -r release/Resource_Pack.zip Resource_Pack/
+          zip -r release/Mineconomy-Resource-Pack.zip Mineconomy-Resource-Pack/
 
       - name: Upload Release
         uses: ncipollo/release-action@v1
