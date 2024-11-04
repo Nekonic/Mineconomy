@@ -22,13 +22,17 @@ jobs:
           distribution: 'temurin'
           java-version: '22'
 
+
+      - name: Generate build.gradle for Mineconomy-Core
+        run: |
+          echo "plugins { id 'java' }" > Mineconomy-Core/build.gradle
+
       - name: Build Mineconomy-Core
         run: |
           cd Mineconomy-Core
           gradle wrapper  # Gradle Wrapper 동적 생성
           ./gradlew build
           cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
-
 
       - name: Build Dynamic_Graph
         run: |
