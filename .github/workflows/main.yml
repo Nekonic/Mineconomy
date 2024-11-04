@@ -35,8 +35,9 @@ jobs:
         run: |
           mkdir release
           cp -r build/libs/* release/
-          cp -r path/to/Dynamic_Graph/build/libs/* release/
-          cp -r path/to/Resource_Pack/*.zip release/
+          cp -r ./Dynamic_Graph/build/libs/* release/  # Dynamic_Graph 경로 수정
+          cp -r ./Resource_Pack/*.zip release/         # Resource_Pack 경로 수정
+        
 
       - name: Upload to GitHub Release
         uses: ncipollo/release-action@v1
