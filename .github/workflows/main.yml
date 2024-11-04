@@ -19,18 +19,16 @@ jobs:
           distribution: 'temurin'
           java-version: '22'
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
+      - name: Install Gradle
+        run: |
+          sudo apt update
+          sudo apt install -y gradle
+          
+      - name: Verify Gradle installation
+        run: gradle -v  # 설치된 Gradle 버전 확인용
 
       - name: Build with Gradle
-        run: gradle build  # gradlew 대신 gradle로 직접 호출
+        run: gradle build
 
       - name: Package Release Files
         run: |
