@@ -52,7 +52,7 @@ Mineconomy is an open-source plugin project designed to build an economic system
 3. Set `require-resource-pack=` to `true`.
 4. Use the following command to encrypt the resource pack file to SHA-1, and paste the code in the `resource-pack-sha1=` field:
 ```shell
-certutil -hashfile .\Mineconomy-Resource-Pack-main.zip sha1
+certutil -hashfile .\Mineconomy-Resource-Pack.zip sha1
 ```
 5. Complete the initial setup through the config.yml file.
 6. Restart the server or use the /reload confirm command to enable the plugin.
