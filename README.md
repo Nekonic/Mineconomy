@@ -55,7 +55,7 @@ Mineconomy is an open-source plugin project designed to build an economic system
 certutil -hashfile .\Mineconomy-Resource-Pack.zip sha1
 ```
 5. Complete the initial setup through the config.yml file.
-6. Restart the server or use the /reload confirm command to enable the plugin.
+6. Restart the server or use the `/reload confirm` command to enable the plugin.
 
 ## Contributing
 Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file to learn how you can contribute.
