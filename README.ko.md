@@ -51,8 +51,14 @@ Mineconomy는 Minecraft 서버에 경제 시스템을 구축하기 위한 오픈
 2. 플러그인의 리소스팩의 경로를 복사하여 `server.properties` 파일의 `resource-pack=` 뒤에 붙입니다.
 3. `require-resource-pack=`을 `true`로 바꿉니다.
 4. `resource-pack-sha1=`부분에 리소스팩 파일을 SHA-1로 암호화한 코드를 넣습니다.
+
+windows : 
 ```shell
 certutil -hashfile .\Mineconomy-Resource-Pack.zip sha1
+```
+linux : 
+```bash
+sha1sum Mineconomy-Resource-Pack.zip
 ```
 5. `config.yml` 파일을 통해 초기 설정을 완료합니다.
 6. 서버를 재시작하거나 `/reload confirm` 명령어를 사용해 플러그인을 활성화합니다.
