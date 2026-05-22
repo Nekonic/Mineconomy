@@ -38,7 +38,9 @@ jobs:
         run: |
           mkdir -p release
           cp dist/Mineconomy-*.jar release/
-          zip -r release/Mineconomy-Resource-Pack.zip Mineconomy-Resource-Pack/
+          if [ -d "Mineconomy-Resource-Pack" ] && [ -n "$(ls -A Mineconomy-Resource-Pack)" ]; then
+            zip -r release/Mineconomy-Resource-Pack.zip Mineconomy-Resource-Pack/
+          fi
 
       - name: Upload Release
         uses: ncipollo/release-action@v1
@@ -46,8 +48,6 @@ jobs:
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: This is a stable release.
-          artifacts: |
-            release/*.jar
-            release/*.zip
+          artifacts: "release/*"
           removeArtifacts: true
           skipIfReleaseExists: false
