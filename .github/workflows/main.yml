@@ -3,7 +3,7 @@ name: Build and Release Mineconomy
 on:
   push:
     tags:
-      - 'v*'  # 태그가 v로 시작하는 경우에만 실행
+      - 'v*'
 
 jobs:
   build-and-release:
@@ -11,42 +11,33 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          submodules: recursive  # 서브모듈 포함하여 체크아웃
+          submodules: recursive
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
 
       - name: Cache Gradle dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Build Mineconomy-Core
+      - name: Build
         run: |
-          cd Mineconomy-Core
           chmod +x ./gradlew
-          ./gradlew build  # 빌드 명령어 실행
-          mkdir -p ../release
-          cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
+          ./gradlew :mineconomy-gui:shadowJar
 
-      - name: Build Dynamic_Graph
-        run: |
-          cd Dynamic_Graph
-          chmod +x ./gradlew
-          ./gradlew build  # 빌드 명령어 실행
-          cp build/libs/*.jar ../release  # 최종 빌드된 JAR 파일을 release 폴더에 복사
-
-      - name: Package Mineconomy-Resource-Pack
+      - name: Collect artifacts
         run: |
           mkdir -p release
+          cp mineconomy-gui/build/libs/Mineconomy-*.jar release/
           zip -r release/Mineconomy-Resource-Pack.zip Mineconomy-Resource-Pack/
 
       - name: Upload Release
@@ -58,6 +49,5 @@ jobs:
           artifacts: |
             release/*.jar
             release/*.zip
-          removeArtifacts: true        # 기존 아티팩트를 제거하고 새 아티팩트 추가
-          skipIfReleaseExists: false   # 릴리즈가 이미 있으면 업데이트
-      
+          removeArtifacts: true
+          skipIfReleaseExists: false
