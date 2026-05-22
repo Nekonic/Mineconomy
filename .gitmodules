@@ -1,0 +1,4 @@
+[submodule "resource-pack"]
+	path = resource-pack
+	url = https://github.com/Nekonic/Mineconomy-Resource-Pack
+	branch = main
