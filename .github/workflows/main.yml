@@ -38,9 +38,7 @@ jobs:
         run: |
           mkdir -p release
           cp dist/Mineconomy-*.jar release/
-          if [ -d "Mineconomy-Resource-Pack" ] && [ -n "$(ls -A Mineconomy-Resource-Pack)" ]; then
-            zip -r release/Mineconomy-Resource-Pack.zip Mineconomy-Resource-Pack/
-          fi
+          zip -r release/Mineconomy-Resource-Pack.zip resource-pack/
 
       - name: Upload Release
         uses: ncipollo/release-action@v1
