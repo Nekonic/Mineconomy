@@ -37,7 +37,7 @@ jobs:
       - name: Collect artifacts
         run: |
           mkdir -p release
-          cp mineconomy-gui/build/libs/Mineconomy-*.jar release/
+          cp dist/Mineconomy-*.jar release/
           zip -r release/Mineconomy-Resource-Pack.zip Mineconomy-Resource-Pack/
 
       - name: Upload Release
