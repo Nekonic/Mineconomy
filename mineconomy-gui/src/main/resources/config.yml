@@ -1,1 +1,21 @@
+database:
+  type: mariadb
+  host: localhost
+  port: 3306
+  name: mineconomy
+  user: mineconomy
+  password: '1234'
+  pool-size: 10
+
+# 거래소 유동성 풀 초기값 (DB에 풀이 없을 때만 적용)
+# 각 항목을 생략하면 코드 기본값이 사용됩니다.
+exchange:
+  pools: {}
+#   stone:
+#     item-reserve: 10000
+#     currency-reserve: 10000
+#   iron_ingot:
+#     item-reserve: 2000
+#     currency-reserve: 200000
+
 npcs: []

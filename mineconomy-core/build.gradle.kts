@@ -9,10 +9,10 @@ dependencies {
     implementation(libs.exposed.jdbc)
     implementation(libs.hikari)
     runtimeOnly(libs.mysql.connector)
+    runtimeOnly(libs.mariadb.connector)
 
     // DI
     implementation(libs.koin.core)
 
-    // 코루틴 (Paper 번들 버전과 호환 맞춤)
-    compileOnly(libs.coroutines.core)
+    implementation(libs.coroutines.core)
 }

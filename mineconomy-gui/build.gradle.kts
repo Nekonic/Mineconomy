@@ -7,7 +7,14 @@ dependencies {
     compileOnly(libs.vault.api)
 
     implementation(project(":mineconomy-core"))
-    // mineconomy-api는 core가 transitive하게 노출
+    runtimeOnly(libs.mysql.connector)
+    runtimeOnly(libs.mariadb.connector)
+
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.hikari)
+    implementation(libs.koin.core)
+    implementation(libs.coroutines.core)
 }
 
 tasks {
