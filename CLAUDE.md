@@ -25,8 +25,6 @@ resource-pack/    # Git submodule
 
 ## 코드 스타일
 
-- 
-- 
 - 언어: Kotlin, Java 25
 - 금액: 항상 `Long` (`Double`/`Float` 금지)
 - 수수료 계산: `amount * 25 / 1000` (버림)

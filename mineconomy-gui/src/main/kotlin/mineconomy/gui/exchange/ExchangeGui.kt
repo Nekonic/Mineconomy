@@ -353,23 +353,26 @@ class ExchangeGui(
         player.openInventory(inv)
     }
 
-    // 인벤토리에 바 하나를 그린다. dataPointIdx 0-3, level 0-8 (아래→위)
+    // 인벤토리에 바 하나를 그린다. dataPointIdx 0-3, level 1-8 (아래→위)
+    // level=짝수: fullRows=level/2 행 전체 채움 (CMD=1)
+    // level=홀수: fullRows행 전체 + 1행 하단 절반 채움 (CMD=2)
     private fun drawBar(inv: Inventory, dataPointIdx: Int, level: Int, color: Color) {
         if (level == 0) return
-        val base = dataPointIdx * 2
-        // 채움 순서: 행3 좌→우, 행2 좌→우, 행1 좌→우, 행0 좌→우
-        val fillOrder = listOf(
-            Pair(27 + base, 7),  // bit1 CMD7 (행3 좌)
-            Pair(28 + base, 8),  // bit0 CMD8 (행3 우)
-            Pair(18 + base, 5),  // bit3 CMD5 (행2 좌)
-            Pair(19 + base, 6),  // bit2 CMD6 (행2 우)
-            Pair( 9 + base, 3),  // bit5 CMD3 (행1 좌)
-            Pair(10 + base, 4),  // bit4 CMD4 (행1 우)
-            Pair( 0 + base, 1),  // bit7 CMD1 (행0 좌)
-            Pair( 1 + base, 2),  // bit6 CMD2 (행0 우)
-        )
-        fillOrder.take(level).forEach { (slot, cmd) ->
-            inv.setItem(slot, chartPiece(cmd, color))
+        val base      = dataPointIdx * 2
+        val fullRows  = level / 2
+        val hasHalf   = level % 2 == 1
+
+        for (r in 0 until fullRows) {
+            val row = 3 - r
+            inv.setItem(row * 9 + base,     chartPiece(1, color))
+            inv.setItem(row * 9 + base + 1, chartPiece(1, color))
+        }
+        if (hasHalf) {
+            val row = 3 - fullRows
+            if (row >= 0) {
+                inv.setItem(row * 9 + base,     chartPiece(2, color))
+                inv.setItem(row * 9 + base + 1, chartPiece(2, color))
+            }
         }
     }
 
