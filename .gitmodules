@@ -1,4 +1,4 @@
-[submodule "Mineconomy-Resource-Pack"]
-	path = Mineconomy-Resource-Pack
+[submodule "mineconomy-resource-pack"]
+	path = mineconomy-resource-pack
 	url = https://github.com/Nekonic/Mineconomy-Resource-Pack
 	branch = main
