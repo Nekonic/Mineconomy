@@ -314,7 +314,7 @@ class ExchangeGui(
     private fun borderPane(): ItemStack {
         val stack = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
         val meta  = stack.itemMeta
-        meta.displayName(Component.empty())
+        meta.setHideTooltip(true)
         stack.itemMeta = meta
         return stack
     }
