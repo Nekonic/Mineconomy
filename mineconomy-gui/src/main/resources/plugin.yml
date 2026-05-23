@@ -1,5 +1,5 @@
 name: Mineconomy
-version: '${project.version}'
+version: '${version}'
 main: mineconomy.gui.MineconomyGuiPlugin
 api-version: '26.1'
 description: Minecraft 종합 경제 플러그인 (AMM, 주식, 금융, 파생상품)

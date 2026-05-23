@@ -11,18 +11,19 @@ dependencies {
 }
 
 tasks {
+    processResources {
+        filesMatching("plugin.yml") {
+            expand("version" to project.version)
+        }
+    }
+
     shadowJar {
         archiveBaseName.set("Mineconomy")
         archiveClassifier.set("")
         archiveVersion.set(project.version.toString())
         destinationDirectory.set(rootProject.layout.projectDirectory.dir("dist"))
 
-        // Paper가 런타임에 제공하는 라이브러리 제외
         dependencies {
-            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
-            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8"))
-            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7"))
-            exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib-common"))
             exclude(dependency("org.jetbrains:annotations"))
         }
 
