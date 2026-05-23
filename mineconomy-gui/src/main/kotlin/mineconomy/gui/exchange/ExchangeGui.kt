@@ -321,8 +321,9 @@ class ExchangeGui(
 
     private fun showChart(player: Player, item: TradeableItem, history: List<Long>, listPage: Int) {
         if (!player.isOnline) return
+        // "샮" 문자 → default.json의 custom_graph3.png 비트맵 폰트 렌더링 (커스텀 GUI 배경)
         val inv = Bukkit.createInventory(null, 54,
-            tx("차트 — ", NamedTextColor.GOLD).append(item.displayName))
+            Component.text("샮").decoration(TextDecoration.ITALIC, false))
 
         // 차트 영역(행 0-3): 어두운 배경
         val bg = darkPane()
@@ -334,12 +335,17 @@ class ExchangeGui(
         if (history.isEmpty()) {
             inv.setItem(22, navItem(Material.BARRIER, "거래 데이터 없음"))
         } else {
-            val maxPrice = history.max()
+            val minPrice   = history.min()
+            val maxPrice   = history.max()
+            val range      = maxPrice - minPrice
             val dataPoints = history.size.coerceAtMost(4)
             for (i in 0 until dataPoints) {
                 val price = history[history.size - dataPoints + i]
-                val level = if (maxPrice > 0) (price * 8 / maxPrice).toInt().coerceIn(0, 8) else 0
-                drawBar(inv, i, level)
+                val prev  = if (i > 0) history[history.size - dataPoints + i - 1] else null
+                // 가격 변동 없으면 중간 높이(4), 변동 있으면 min→1, max→8로 정규화
+                val level = if (range == 0L) 4
+                            else ((price - minPrice) * 7 / range + 1).toInt().coerceIn(1, 8)
+                drawBar(inv, i, level, barColor(price, prev))
             }
             inv.setItem(49, buildPriceInfo(item, history.last()))
         }
@@ -349,7 +355,7 @@ class ExchangeGui(
     }
 
     // 인벤토리에 바 하나를 그린다. dataPointIdx 0-3, level 0-8 (아래→위)
-    private fun drawBar(inv: Inventory, dataPointIdx: Int, level: Int) {
+    private fun drawBar(inv: Inventory, dataPointIdx: Int, level: Int, color: Color) {
         if (level == 0) return
         val base = dataPointIdx * 2
         // 채움 순서: 행3 좌→우, 행2 좌→우, 행1 좌→우, 행0 좌→우
@@ -364,8 +370,15 @@ class ExchangeGui(
             Pair( 1 + base, 2),  // bit6 CMD2 (행0 우)
         )
         fillOrder.take(level).forEach { (slot, cmd) ->
-            inv.setItem(slot, chartPiece(cmd))
+            inv.setItem(slot, chartPiece(cmd, color))
         }
+    }
+
+    // 한국식: 상승=빨강, 하락=파랑, 기준(첫 번째)=회색
+    private fun barColor(price: Long, prev: Long?): Color = when {
+        prev == null || price == prev -> Color.fromRGB(150, 150, 150)
+        price > prev                 -> Color.fromRGB(220,  50,  50)
+        else                         -> Color.fromRGB( 50, 100, 220)
     }
 
     private fun handleChartClick(player: Player, screen: ChartScreen, slot: Int) {
@@ -386,10 +399,10 @@ class ExchangeGui(
         return stack
     }
 
-    private fun chartPiece(cmd: Int): ItemStack {
+    private fun chartPiece(cmd: Int, color: Color): ItemStack {
         val stack = ItemStack(Material.POTION)
         val meta  = stack.itemMeta as PotionMeta
-        meta.color = Color.fromRGB(255, 170, 0)  // 금색
+        meta.color = color
         @Suppress("DEPRECATION")
         meta.setCustomModelData(cmd)
         meta.setHideTooltip(true)
