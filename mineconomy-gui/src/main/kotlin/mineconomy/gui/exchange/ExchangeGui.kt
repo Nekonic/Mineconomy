@@ -11,8 +11,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Bukkit
+import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -43,6 +45,11 @@ private data class TradeScreen(
     val item: TradeableItem,
     val pool: LiquidityPool,
     val qty: Long,
+    val listPage: Int,
+) : GuiScreen
+private data class ChartScreen(
+    override val inv: Inventory,
+    val item: TradeableItem,
     val listPage: Int,
 ) : GuiScreen
 
@@ -127,6 +134,7 @@ class ExchangeGui(
             tx("${qty}개 판매", NamedTextColor.WHITE),
             tx("예상 수익: ₩${sellRev.fmt()}", NamedTextColor.YELLOW),
         )))
+        inv.setItem(6, navItem(Material.CLOCK, "가격 차트 ▶"))
         inv.setItem(26, navItem(Material.ARROW, "◀ 돌아가기"))
 
         sessions[player.uniqueId] = TradeScreen(inv, entry, pool, qty, listPage)
@@ -181,6 +189,7 @@ class ExchangeGui(
         when (screen) {
             is ListScreen  -> handleListClick(player, screen, event.slot)
             is TradeScreen -> handleTradeClick(player, screen, event.slot)
+            is ChartScreen -> handleChartClick(player, screen, event.slot)
         }
     }
 
@@ -217,6 +226,7 @@ class ExchangeGui(
             return
         }
         when (slot) {
+            6    -> openChart(player, screen.item, screen.listPage)
             18   -> executeBuy(player, screen)
             22   -> executeSell(player, screen)
             26   -> reloadList(player, screen.listPage)
@@ -300,6 +310,101 @@ class ExchangeGui(
         }
     }
 
+    // ── 차트 화면 ─────────────────────────────────────────────────────────────
+
+    private fun openChart(player: Player, item: TradeableItem, listPage: Int) {
+        scope.launch {
+            val history = exchangeService.getPriceHistory(item.key, 4)
+            runOnMain { showChart(player, item, history, listPage) }
+        }
+    }
+
+    private fun showChart(player: Player, item: TradeableItem, history: List<Long>, listPage: Int) {
+        if (!player.isOnline) return
+        val inv = Bukkit.createInventory(null, 54,
+            tx("차트 — ", NamedTextColor.GOLD).append(item.displayName))
+
+        // 차트 영역(행 0-3): 어두운 배경
+        val bg = darkPane()
+        for (i in 0 until 36) inv.setItem(i, bg)
+        // 하단 영역(행 4-5): 테두리 + 버튼
+        for (i in 36 until 54) inv.setItem(i, borderPane())
+        inv.setItem(45, navItem(Material.ARROW, "◀ 돌아가기"))
+
+        if (history.isEmpty()) {
+            inv.setItem(22, navItem(Material.BARRIER, "거래 데이터 없음"))
+        } else {
+            val maxPrice = history.max()
+            val dataPoints = history.size.coerceAtMost(4)
+            for (i in 0 until dataPoints) {
+                val price = history[history.size - dataPoints + i]
+                val level = if (maxPrice > 0) (price * 8 / maxPrice).toInt().coerceIn(0, 8) else 0
+                drawBar(inv, i, level)
+            }
+            inv.setItem(49, buildPriceInfo(item, history.last()))
+        }
+
+        sessions[player.uniqueId] = ChartScreen(inv, item, listPage)
+        player.openInventory(inv)
+    }
+
+    // 인벤토리에 바 하나를 그린다. dataPointIdx 0-3, level 0-8 (아래→위)
+    private fun drawBar(inv: Inventory, dataPointIdx: Int, level: Int) {
+        if (level == 0) return
+        val base = dataPointIdx * 2
+        // 채움 순서: 행3 좌→우, 행2 좌→우, 행1 좌→우, 행0 좌→우
+        val fillOrder = listOf(
+            Pair(27 + base, 7),  // bit1 CMD7 (행3 좌)
+            Pair(28 + base, 8),  // bit0 CMD8 (행3 우)
+            Pair(18 + base, 5),  // bit3 CMD5 (행2 좌)
+            Pair(19 + base, 6),  // bit2 CMD6 (행2 우)
+            Pair( 9 + base, 3),  // bit5 CMD3 (행1 좌)
+            Pair(10 + base, 4),  // bit4 CMD4 (행1 우)
+            Pair( 0 + base, 1),  // bit7 CMD1 (행0 좌)
+            Pair( 1 + base, 2),  // bit6 CMD2 (행0 우)
+        )
+        fillOrder.take(level).forEach { (slot, cmd) ->
+            inv.setItem(slot, chartPiece(cmd))
+        }
+    }
+
+    private fun handleChartClick(player: Player, screen: ChartScreen, slot: Int) {
+        if (slot == 45) {
+            scope.launch {
+                val pool = exchangeService.getPool(screen.item.key) ?: return@launch
+                runOnMain { showTrade(player, screen.item, pool, QTY_OPTIONS[0], screen.listPage) }
+            }
+        }
+    }
+
+    private fun buildPriceInfo(item: TradeableItem, price: Long): ItemStack {
+        val stack = ItemStack(item.material)
+        val meta  = stack.itemMeta
+        meta.displayName(item.displayName)
+        meta.lore(listOf(tx("현재 가격: ₩${price.fmt()}/개", NamedTextColor.YELLOW)))
+        stack.itemMeta = meta
+        return stack
+    }
+
+    private fun chartPiece(cmd: Int): ItemStack {
+        val stack = ItemStack(Material.POTION)
+        val meta  = stack.itemMeta as PotionMeta
+        meta.color = Color.fromRGB(255, 170, 0)  // 금색
+        @Suppress("DEPRECATION")
+        meta.setCustomModelData(cmd)
+        meta.setHideTooltip(true)
+        stack.itemMeta = meta
+        return stack
+    }
+
+    private fun darkPane(): ItemStack {
+        val stack = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
+        val meta  = stack.itemMeta
+        meta.setHideTooltip(true)
+        stack.itemMeta = meta
+        return stack
+    }
+
     // ── 인벤토리 유틸 ─────────────────────────────────────────────────────────
 
     private fun fillBorder(inv: Inventory) {
@@ -328,7 +433,7 @@ class ExchangeGui(
     }
 
     private fun countItems(player: Player, mat: Material): Long =
-        player.inventory.contents.orEmpty()
+        player.inventory.contents
             .filterNotNull()
             .filter { it.type == mat }
             .sumOf { it.amount.toLong() }

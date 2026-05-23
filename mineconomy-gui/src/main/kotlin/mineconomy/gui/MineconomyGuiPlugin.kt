@@ -10,6 +10,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import mineconomy.core.amm.ExchangeService
 import mineconomy.core.amm.PoolTable
+import mineconomy.core.amm.PriceHistoryTable
 import mineconomy.core.db.AccountTable
 import mineconomy.core.di.coreModule
 import mineconomy.core.economy.MineconomyApiImpl
@@ -112,7 +113,7 @@ class MineconomyGuiPlugin : JavaPlugin() {
             }
             Database.connect(HikariDataSource(hikariConfig))
             @Suppress("DEPRECATION")
-            transaction { SchemaUtils.createMissingTablesAndColumns(AccountTable, PoolTable) }
+            transaction { SchemaUtils.createMissingTablesAndColumns(AccountTable, PoolTable, PriceHistoryTable) }
         } catch (e: Exception) {
             slF4JLogger.error("데이터베이스 연결 실패: ${e.message}")
             slF4JLogger.error("plugins/Mineconomy/config.yml 에서 database 설정을 확인하세요.")
