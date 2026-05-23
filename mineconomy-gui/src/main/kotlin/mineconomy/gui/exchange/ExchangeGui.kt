@@ -15,6 +15,7 @@ import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.meta.PotionMeta
+import org.bukkit.inventory.meta.components.CustomModelDataComponent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -323,7 +324,8 @@ class ExchangeGui(
         if (!player.isOnline) return
         // "샮" 문자 → default.json의 custom_graph3.png 비트맵 폰트 렌더링 (커스텀 GUI 배경)
         val inv = Bukkit.createInventory(null, 54,
-            Component.text("샮").decoration(TextDecoration.ITALIC, false))
+            Component.text("궯샮", NamedTextColor.WHITE)
+                .decoration(TextDecoration.ITALIC, false))
 
         // 차트 영역(행 0-3): 어두운 배경
         val bg = darkPane()
@@ -403,8 +405,9 @@ class ExchangeGui(
         val stack = ItemStack(Material.POTION)
         val meta  = stack.itemMeta as PotionMeta
         meta.color = color
-        @Suppress("DEPRECATION")
-        meta.setCustomModelData(cmd)
+        val cmdData = meta.customModelDataComponent
+        cmdData.floats = listOf(cmd.toFloat())
+        meta.setCustomModelDataComponent(cmdData)
         meta.setHideTooltip(true)
         stack.itemMeta = meta
         return stack
