@@ -339,12 +339,13 @@ class ExchangeGui(
             val range      = maxPrice - minPrice
             val dataPoints = history.size.coerceAtMost(4)
             for (i in 0 until dataPoints) {
-                val price = history[history.size - dataPoints + i]
-                val prev  = if (i > 0) history[history.size - dataPoints + i - 1] else null
-                // 가격 변동 없으면 중간 높이(4), 변동 있으면 min→1, max→8로 정규화
-                val level = if (range == 0L) 4
-                            else ((price - minPrice) * 7 / range + 1).toInt().coerceIn(1, 8)
-                drawBar(inv, i, level, barColor(price, prev))
+                val price  = history[history.size - dataPoints + i]
+                val prev   = if (i > 0) history[history.size - dataPoints + i - 1] else null
+                val level  = if (range == 0L) 4
+                             else ((price - minPrice) * 7 / range + 1).toInt().coerceIn(1, 8)
+                val isLast = i == dataPoints - 1
+                drawBar(inv, i, level, barColor(price, prev), price, prev,
+                        if (isLast) maxPrice else null, if (isLast) minPrice else null)
             }
             inv.setItem(49, buildPriceInfo(item, history.last()))
         }
@@ -353,25 +354,51 @@ class ExchangeGui(
         player.openInventory(inv)
     }
 
-    // 인벤토리에 바 하나를 그린다. dataPointIdx 0-3, level 1-8 (아래→위)
-    // level=짝수: fullRows=level/2 행 전체 채움 (CMD=1)
-    // level=홀수: fullRows행 전체 + 1행 하단 절반 채움 (CMD=2)
-    private fun drawBar(inv: Inventory, dataPointIdx: Int, level: Int, color: Color) {
+    private fun drawBar(
+        inv: Inventory, dataPointIdx: Int, level: Int, color: Color,
+        price: Long, prev: Long?, highPrice: Long?, lowPrice: Long?,
+    ) {
         if (level == 0) return
-        val base      = dataPointIdx * 2
-        val fullRows  = level / 2
-        val hasHalf   = level % 2 == 1
+        val base     = dataPointIdx * 2
+        val fullRows = level / 2
+        val hasHalf  = level % 2 == 1
+
+        val nameColor = when {
+            prev == null || price == prev -> NamedTextColor.GRAY
+            price > prev                 -> NamedTextColor.RED
+            else                         -> NamedTextColor.BLUE
+        }
+        val name = tx("₩${price.fmt()}", nameColor)
+        val lore = buildList<Component> {
+            if (prev != null) {
+                val delta    = price - prev
+                val absDelta = if (delta < 0) -delta else delta
+                val pct      = if (prev > 0) delta * 100.0 / prev else 0.0
+                val arrow    = if (delta > 0) "▲" else if (delta < 0) "▼" else "━"
+                val loreColor = when {
+                    delta > 0 -> NamedTextColor.RED
+                    delta < 0 -> NamedTextColor.BLUE
+                    else      -> NamedTextColor.GRAY
+                }
+                add(tx("$arrow ${absDelta.fmt()} (${"%.2f".format(pct)}%)", loreColor))
+            }
+            if (highPrice != null && lowPrice != null) {
+                add(Component.empty())
+                add(tx("고가  ₩${highPrice.fmt()}", NamedTextColor.RED))
+                add(tx("저가  ₩${lowPrice.fmt()}", NamedTextColor.BLUE))
+            }
+        }
 
         for (r in 0 until fullRows) {
             val row = 3 - r
-            inv.setItem(row * 9 + base,     chartPiece(1, color))
-            inv.setItem(row * 9 + base + 1, chartPiece(1, color))
+            inv.setItem(row * 9 + base,     chartPiece(1, color, name, lore))
+            inv.setItem(row * 9 + base + 1, chartPiece(1, color, name, lore))
         }
         if (hasHalf) {
             val row = 3 - fullRows
             if (row >= 0) {
-                inv.setItem(row * 9 + base,     chartPiece(2, color))
-                inv.setItem(row * 9 + base + 1, chartPiece(2, color))
+                inv.setItem(row * 9 + base,     chartPiece(2, color, name, lore))
+                inv.setItem(row * 9 + base + 1, chartPiece(2, color, name, lore))
             }
         }
     }
@@ -401,14 +428,22 @@ class ExchangeGui(
         return stack
     }
 
-    private fun chartPiece(cmd: Int, color: Color): ItemStack {
+    private fun chartPiece(
+        cmd: Int, color: Color,
+        name: Component? = null, lore: List<Component> = emptyList(),
+    ): ItemStack {
         val stack = ItemStack(Material.POTION)
         val meta  = stack.itemMeta as PotionMeta
         meta.color = color
         val cmdData = meta.customModelDataComponent
         cmdData.floats = listOf(cmd.toFloat())
         meta.setCustomModelDataComponent(cmdData)
-        meta.setHideTooltip(true)
+        if (name != null) {
+            meta.displayName(name)
+            if (lore.isNotEmpty()) meta.lore(lore)
+        } else {
+            meta.setHideTooltip(true)
+        }
         stack.itemMeta = meta
         return stack
     }
