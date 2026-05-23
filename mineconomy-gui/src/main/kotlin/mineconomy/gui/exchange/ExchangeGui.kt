@@ -14,6 +14,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.inventory.meta.components.CustomModelDataComponent
 import org.bukkit.event.EventHandler
@@ -327,8 +328,6 @@ class ExchangeGui(
             Component.text("궯샮", NamedTextColor.WHITE)
                 .decoration(TextDecoration.ITALIC, false))
 
-        // 하단 영역(행 4-5): 테두리 + 버튼
-        for (i in 36 until 54) inv.setItem(i, borderPane())
         inv.setItem(45, navItem(Material.ARROW, "◀ 돌아가기"))
 
         if (history.isEmpty()) {
@@ -438,6 +437,7 @@ class ExchangeGui(
         val cmdData = meta.customModelDataComponent
         cmdData.floats = listOf(cmd.toFloat())
         meta.setCustomModelDataComponent(cmdData)
+        meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
         if (name != null) {
             meta.displayName(name)
             if (lore.isNotEmpty()) meta.lore(lore)
