@@ -387,13 +387,11 @@ class ExchangeGui(
         }
 
         // 4×4 그리드: row3(하단)부터 왼→오른 순으로 level개 셀 채움
-        // 각 셀은 해당 비트 하나의 단일 레이어 모델 사용 (5-레이어 한계 회피)
+        // 채워진 슬롯만 솔리드 아이템 배치, 빈 슬롯에는 아무것도 두지 않음
         for (i in 0 until level) {
             val rowInBar = i / 4
             val colInBar = i % 4
-            val bit = (3 - rowInBar) * 4 + (3 - colInBar)
-            val cmd = (1 shl bit).toFloat()
-            inv.setItem((3 - rowInBar) * 9 + base + colInBar, chartPiece(cmd, color, name, lore))
+            inv.setItem((3 - rowInBar) * 9 + base + colInBar, chartPiece(1f, color, name, lore))
         }
     }
 
