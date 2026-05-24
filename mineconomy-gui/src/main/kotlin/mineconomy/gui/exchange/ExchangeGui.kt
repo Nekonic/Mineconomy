@@ -316,7 +316,7 @@ class ExchangeGui(
 
     private fun openChart(player: Player, item: TradeableItem, listPage: Int) {
         scope.launch {
-            val history = exchangeService.getPriceHistory(item.key, 4)
+            val history = exchangeService.getPriceHistory(item.key, 2)
             runOnMain { showChart(player, item, history, listPage) }
         }
     }
@@ -336,12 +336,12 @@ class ExchangeGui(
             val minPrice   = history.min()
             val maxPrice   = history.max()
             val range      = maxPrice - minPrice
-            val dataPoints = history.size.coerceAtMost(4)
+            val dataPoints = history.size.coerceAtMost(2)
             for (i in 0 until dataPoints) {
                 val price  = history[history.size - dataPoints + i]
                 val prev   = if (i > 0) history[history.size - dataPoints + i - 1] else null
-                val level  = if (range == 0L) 4
-                             else ((price - minPrice) * 7 / range + 1).toInt().coerceIn(1, 8)
+                val level  = if (range == 0L) 16
+                             else ((price - minPrice) * 15 / range + 1).toInt().coerceIn(1, 16)
                 val isLast = i == dataPoints - 1
                 drawBar(inv, i, level, barColor(price, prev), price, prev,
                         if (isLast) maxPrice else null, if (isLast) minPrice else null)
@@ -358,9 +358,7 @@ class ExchangeGui(
         price: Long, prev: Long?, highPrice: Long?, lowPrice: Long?,
     ) {
         if (level == 0) return
-        val base     = dataPointIdx * 2
-        val fullRows = level / 2
-        val hasHalf  = level % 2 == 1
+        val base = dataPointIdx * 4
 
         val nameColor = when {
             prev == null || price == prev -> NamedTextColor.GRAY
@@ -388,17 +386,11 @@ class ExchangeGui(
             }
         }
 
-        for (r in 0 until fullRows) {
-            val row = 3 - r
-            inv.setItem(row * 9 + base,     chartPiece(1, color, name, lore))
-            inv.setItem(row * 9 + base + 1, chartPiece(1, color, name, lore))
-        }
-        if (hasHalf) {
-            val row = 3 - fullRows
-            if (row >= 0) {
-                inv.setItem(row * 9 + base,     chartPiece(2, color, name, lore))
-                inv.setItem(row * 9 + base + 1, chartPiece(2, color, name, lore))
-            }
+        // 4×4 그리드: row3(하단)부터 왼→오른 순으로 level개 셀 채움
+        for (i in 0 until level) {
+            val row = 3 - (i / 4)
+            val col = i % 4
+            inv.setItem(row * 9 + base + col, chartPiece(65535f, color, name, lore))
         }
     }
 
@@ -428,14 +420,14 @@ class ExchangeGui(
     }
 
     private fun chartPiece(
-        cmd: Int, color: Color,
+        cmd: Float, color: Color,
         name: Component? = null, lore: List<Component> = emptyList(),
     ): ItemStack {
         val stack = ItemStack(Material.POTION)
         val meta  = stack.itemMeta as PotionMeta
         meta.color = color
         val cmdData = meta.customModelDataComponent
-        cmdData.floats = listOf(cmd.toFloat())
+        cmdData.floats = listOf(cmd)
         meta.setCustomModelDataComponent(cmdData)
         meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
         if (name != null) {
