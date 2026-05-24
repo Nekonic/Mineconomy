@@ -387,11 +387,11 @@ class ExchangeGui(
         }
 
         // 4×4 그리드: row3(하단)부터 왼→오른 순으로 level개 셀 채움
-        // 채워진 슬롯만 솔리드 아이템 배치, 빈 슬롯에는 아무것도 두지 않음
+        // 채워진 슬롯만 배치, 빈 슬롯에는 아무것도 두지 않음
         for (i in 0 until level) {
             val rowInBar = i / 4
             val colInBar = i % 4
-            inv.setItem((3 - rowInBar) * 9 + base + colInBar, chartPiece(1f, color, name, lore))
+            inv.setItem((3 - rowInBar) * 9 + base + colInBar, chartPiece(65535f, color, name, lore))
         }
     }
 
